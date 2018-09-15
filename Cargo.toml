@@ -1,0 +1,13 @@
+[package]
+name = "battery-status"
+version = "0.1.0"
+authors = ["Dan Reeves <hey@danreev.es>"]
+edition = "2018"
+
+[[bin]]
+name = "battery-status"
+doc = false
+
+[dependencies]
+structopt = "0.2.10"
+regex = "1.0.5"
