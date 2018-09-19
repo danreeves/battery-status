@@ -6,4 +6,5 @@
   - [ ] Docs
   - [ ] Badges/Readme stuff
   - [ ] Publish
-
+  - [ ] Windows support
+  - [ ] Linux support
