@@ -1,5 +1,16 @@
+pub enum BatteryState {
+    Discharging,
+    Charging,
+    ACPower,
+    Unknown,
+}
+
+#[cfg(target_os = "windows")]
+mod utils {}
+
 #[cfg(target_os = "macos")]
 mod utils {
+    use super::BatteryState;
     use regex::Regex;
     use std::process::Command;
 
@@ -14,7 +25,7 @@ mod utils {
     }
 
     pub fn get_percent(raw_output: &String) -> Option<u8> {
-        let regex = Regex::new(r"(\d{2})%").unwrap();
+        let regex = Regex::new(r"(\d{1,3})%").unwrap();
         let matches = regex.captures(raw_output);
         let capture = match matches {
             Some(captures) => captures.get(1),
@@ -37,20 +48,42 @@ mod utils {
 
         percent
     }
+
+    pub fn get_status(raw_output: &String) -> BatteryState {
+        let state_re = Regex::new(r"(charged|charging|discharging)").unwrap();
+        let captures = match state_re.captures(raw_output) {
+            Some(captures) => captures.get(1),
+            None => None,
+        };
+        let drawing_str = match captures {
+            Some(capture) => Some(capture.as_str()),
+            None => None,
+        };
+
+        match drawing_str.unwrap_or("None") {
+            "charged" => BatteryState::ACPower,
+            "charging" => BatteryState::Charging,
+            "discharging" => BatteryState::Discharging,
+            _ => BatteryState::Unknown,
+        }
+    }
 }
 
 pub struct BatteryStatus {
     pub raw_output: String,
     pub percent: Option<u8>,
+    pub status: BatteryState,
 }
 
 impl BatteryStatus {
     pub fn new() -> BatteryStatus {
         let raw_output = utils::get_raw_output();
         let percent = utils::get_percent(&raw_output);
+        let status = utils::get_status(&raw_output);
         BatteryStatus {
             raw_output,
             percent,
+            status,
         }
     }
 }
