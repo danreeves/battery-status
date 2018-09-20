@@ -3,6 +3,7 @@ name = "battery-status"
 version = "0.1.0"
 authors = ["Dan Reeves <hey@danreev.es>"]
 edition = "2018"
+repository = "https://github.com/danreeves/battery-status"
 
 [[bin]]
 name = "battery-status"

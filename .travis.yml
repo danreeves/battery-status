@@ -1,0 +1,55 @@
+dist: trusty
+language: rust
+services: docker
+sudo: required
+
+env:
+  global:
+    - CRATE_NAME=battery-status
+    - RUST_BACKTRACE=1
+
+matrix:
+  include:
+    - env: TARGET=armv7-unknown-linux-gnueabihf
+      rust: nightly
+    - env: TARGET=x86_64-unknown-linux-musl
+      rust: nightly
+    - env: TARGET=x86_64-apple-darwin
+      rust: nightly
+      os: osx
+    - env: TARGET=x86_64-unknown-freebsd DISABLE_TESTS=1
+      rust: nightly
+
+before_install:
+  - set -e
+
+install:
+  - sh scripts/install.sh
+  - source ~/.cargo/env || true
+
+script:
+  - bash scripts/script.sh
+
+after_script: set +e
+
+before_deploy:
+  - sh scripts/before_deploy.sh
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  file_glob: true
+  file: $CRATE_NAME-$TRAVIS_TAG-$TARGET.*
+  api_key:
+    secure: "qu6Zft86hbVlibcO4OGzGvKAPEi+zd2wtOyMsEgVlrKFv0IYkKO0b0El2hA5n0uY3LYdmvV/wTPdgN5Z6VUUvlX52Hff8l7G92ZDrk4XHBXAuWc2mCozvaLYQmYU3x83aPXOZu7UQAzs0Era0VlKIIf2lhGtNaDuXbiJrHH/fJ3TUXT7H8qmoRcWMwL1TRtM1XHijKcutP731/mYD6xGUsN7GoPwkAqHKLU8NNF86AjkzWuO4nPFHZ1Rrx151wO6gSN5Hku+5UOr7ijBFlFNwgMVDPwHvlkDDZIBKr3WBhYyoqKb5V//NYD23UnjeKAUSlIXz81KAgYlT9lfVhT3e977qmTenTd4RoiP5Suv1LHHFd9J97NDN8+4FiGMffJOkmFmJr2Zi/wgwoIimf8KTCLGf3iZT+UaP7X4YqHVqxDON4CSZg8iKgw8JNu4rapJPVmCVWpa3GdugRnf/FD4Cn5CGsZw+JEoOgTPfj4beF3ATXIQHpdaCAJFxN7V8d7HEBLehWHgofFyMFd7BC4ylO+bzkPAhWRK5Cul9iPI+ahn+C8I0PTQGyglgQkHtRlvQylI7ubsH+pZu4V9xuWSbIJO59eQxCLA91mjSQrSgRjnnDGJZu1Hbm4t4Y/vimiRAdynJPJmTUD3KQ/eht/e5+QkMfOajYSZkFogX1vubiE="
+  on:
+    tags: true
+
+cache: cargo
+before_cache:
+  - chmod -R a+r $HOME/.cargo
+
+notifications:
+  email:
+    on_success: never
+    on_failure: never
