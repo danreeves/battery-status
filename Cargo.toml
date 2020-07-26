@@ -4,6 +4,7 @@ edition = "2018"
 name = "battery-status"
 repository = "https://github.com/danreeves/battery-status"
 version = "0.1.0"
+
 [[bin]]
 doc = false
 name = "battery-status"

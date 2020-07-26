@@ -6,7 +6,7 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt()]
 struct Cli {
-    #[structopt(short = "f", long = "format", required = false, default_value = "p s")]
+    #[structopt(short = "f", long = "format", required = false, default_value = "")]
     format: String,
 
     #[structopt(
@@ -37,7 +37,7 @@ fn main() {
     {
         Some(Ok(battery)) => battery,
         Some(Err(_e)) => {
-            println!("{}", _e);
+            println!("Error: {}", _e);
             return;
         }
         None => {
@@ -48,5 +48,9 @@ fn main() {
 
     if args.percent {
         println!("{:?}", battery.state_of_charge())
+    }
+
+    if args.format.len() > 0 {
+        println!("100% Charging")
     }
 }
